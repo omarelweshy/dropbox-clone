@@ -1,3 +1,3 @@
-module github.com/omarelweshy/dropbox-clone
+module dropbox-clone
 
 go 1.21.4
