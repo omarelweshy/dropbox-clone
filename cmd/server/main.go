@@ -1,37 +1,43 @@
 package main
 
 import (
-	"dropbox-clone/internal/auth"
-	"net/http"
+	"dropbox-clone/internal/model"
+	"dropbox-clone/internal/router"
+	"log"
+	"os"
 
-	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
+func setupDB() (*gorm.DB, error) {
+	dbURL := os.Getenv("DATABASE_URL")
+
+	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
+
 func main() {
-	r := gin.Default()
-	r.LoadHTMLGlob("web/templates/*")
-	r.Static("/static", "./web/static")
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", nil)
-	})
-	r.GET("/login-url", func(c *gin.Context) {
-		url := auth.GetGoogleLoginURL()
-		c.JSON(http.StatusOK, gin.H{"url": url})
-	})
-	r.GET("/callback", func(c *gin.Context) {
-		code := c.Query("code")
-		token, err := auth.ExchangeCodeForToken(code)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange token"})
-			return
-		}
-		userInfo, err := auth.GetUserInfo(token)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user info"})
-			return
-		}
-		userInfo["token"] = token.AccessToken
-		c.JSON(http.StatusOK, userInfo)
-	})
-	r.Run(":8080")
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	port := os.Getenv("PORT")
+
+	db, err := setupDB()
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	db.AutoMigrate(&model.User{})
+
+	r := router.SetupRouter(db)
+	if err := r.Run(":" + port); err != nil {
+		log.Fatal(err)
+	}
 }
