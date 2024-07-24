@@ -1,7 +1,7 @@
 package router
 
 import (
-	"dropbox-clone/internal/auth"
+	"dropbox-clone/internal/handler"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -9,37 +9,16 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupRouter(db *gorm.DB) *gin.Engine {
+func SetupRouter(db *gorm.DB, authHandler *handler.AuthHandler) *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.Default())
-	r.LoadHTMLGlob("web/templates/*")
-	r.Static("/static", "./web/static")
 
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
-
-	r.GET("/login-url", func(c *gin.Context) {
-		url := auth.GetGoogleLoginURL()
-		c.JSON(http.StatusOK, gin.H{"url": url})
-	})
-
-	r.GET("/callback", func(c *gin.Context) {
-		code := c.Query("code")
-		token, err := auth.ExchangeCodeForToken(code)
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange token"})
-			return
-		}
-		userInfo, err := auth.GetUserInfo(token)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user info"})
-			return
-		}
-		userInfo["token"] = token.AccessToken
-		c.JSON(http.StatusOK, userInfo)
-	})
+	r.GET("/auth/google/login", authHandler.GoogleLogin)
+	r.GET("/auth/google/callback", authHandler.GoogleCallback)
+	r.POST("/logout", authHandler.Logout)
 
 	return r
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dropbox-clone/internal/handler"
 	"dropbox-clone/internal/model"
 	"dropbox-clone/internal/router"
 	"log"
@@ -35,8 +36,9 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	db.AutoMigrate(&model.User{})
-
-	r := router.SetupRouter(db)
+	// userRepo := &repository.UserRepository{DB: db}
+	authHandler := &handler.AuthHandler{}
+	r := router.SetupRouter(db, authHandler)
 	if err := r.Run(":" + port); err != nil {
 		log.Fatal(err)
 	}

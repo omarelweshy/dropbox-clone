@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gorilla/sessions"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -17,6 +18,8 @@ var googleOauthConfig = &oauth2.Config{
 	Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile"},
 	Endpoint:     google.Endpoint,
 }
+
+var store = sessions.NewCookieStore([]byte(os.Getenv("SECRET_KEY")))
 
 func GetGoogleLoginURL() string {
 	return googleOauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
@@ -43,6 +46,5 @@ func GetUserInfo(token *oauth2.Token) (map[string]interface{}, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
 		return nil, err
 	}
-
 	return userInfo, nil
 }

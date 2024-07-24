@@ -1,11 +1,14 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
 	UserID    uint   `gorm:"primaryKey"`
-	FirstName string `gorm:"not null"`
-	LastName  string `gorm:"not null"`
+	GoogleID  string `gorm:"uniqueIndex"`
+	Name      string `gorm:"not null"`
 	Email     string `gorm:"unique;not null"`
+	Avatar    string `json:"avatar"`
 	CreatedAt time.Time
 }
