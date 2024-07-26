@@ -1,21 +1,18 @@
 package main
 
 import (
+	"dropbox-clone/internal/config"
 	"dropbox-clone/internal/handler"
 	"dropbox-clone/internal/model"
 	"dropbox-clone/internal/router"
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func setupDB() (*gorm.DB, error) {
-	dbURL := os.Getenv("DATABASE_URL")
-
-	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(config.DBUrl), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
@@ -23,23 +20,17 @@ func setupDB() (*gorm.DB, error) {
 }
 
 func main() {
-	err := godotenv.Load()
-
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
-	port := os.Getenv("PORT")
+	config.LoadConfig()
 
 	db, err := setupDB()
+
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	db.AutoMigrate(&model.User{})
-	// userRepo := &repository.UserRepository{DB: db}
 	authHandler := &handler.AuthHandler{}
 	r := router.SetupRouter(db, authHandler)
-	if err := r.Run(":" + port); err != nil {
+	if err := r.Run(":" + config.Port); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -2,10 +2,10 @@ package handler
 
 import (
 	"context"
+	"dropbox-clone/internal/config"
 	"dropbox-clone/internal/model"
 	"dropbox-clone/internal/repository"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
@@ -15,27 +15,31 @@ import (
 	"google.golang.org/api/option"
 )
 
-var (
-	store             = sessions.NewCookieStore([]byte(os.Getenv("SECRET_KEY")))
-	googleOauthConfig = &oauth2.Config{
-		RedirectURL:  os.Getenv("HOST") + "/callback",
-		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-		// Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile"},
-		Scopes:   []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
-		Endpoint: google.Endpoint,
-	}
-)
-
 type AuthHandler struct {
 	userRepository repository.UserRepository
 }
 
 func (h *AuthHandler) GoogleLogin(c *gin.Context) {
-	url := googleOauthConfig.AuthCodeURL("state", oauth2.AccessTypeOffline)
+	var googleOauthConfig = &oauth2.Config{
+		RedirectURL:  config.Host + "/auth/google/callback",
+		ClientID:     config.ClientID,
+		ClientSecret: config.ClientSecret,
+		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
+		Endpoint:     google.Endpoint,
+	}
+	url := googleOauthConfig.AuthCodeURL("state")
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
+
 func (h *AuthHandler) GoogleCallback(c *gin.Context) {
+	var store = sessions.NewCookieStore([]byte(config.SecretKey))
+	var googleOauthConfig = &oauth2.Config{
+		RedirectURL:  config.Host + "/callback",
+		ClientID:     config.ClientID,
+		ClientSecret: config.ClientSecret,
+		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
+		Endpoint:     google.Endpoint,
+	}
 	state := c.Query("state")
 	session, _ := store.Get(c.Request, "sessionid")
 	if state != session.Values["state"] {
@@ -79,6 +83,7 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
+	var store = sessions.NewCookieStore([]byte(config.SecretKey))
 	session, _ := store.Get(c.Request, "sessionid")
 	session.Options.MaxAge = -1
 	session.Save(c.Request, c.Writer)
