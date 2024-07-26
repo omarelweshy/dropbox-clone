@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Home } from './Home'
 
 const loginUrl = process.env.REACT_APP_LOGIN_URL
 
