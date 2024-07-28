@@ -34,10 +34,29 @@ export function LoginCallBack() {
       .then((res) => {
         if (res.status === 200) {
           console.log(res.data)
-          navigate('/')
+          localStorage.setItem('name', res.data.user.Name)
+          localStorage.setItem('avatar', res.data.user.avatar)
+          localStorage.setItem('email', res.data.user.Email)
+          localStorage.setItem('user_id', res.data.user.UserID)
+          setTimeout(() => {
+            navigate('/')
+          }, 5000)
         } else {
           navigate('/login')
         }
       })
   }, [code])
+  return (
+    <div className="bg-gradient-to-r from-white-500 to-indigo-600 flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="loader rounded-full h-24 w-24 border-4 border-white border-opacity-25 mx-auto mb-6"></div>
+        <h1 className="text-3xl font-bold text-black mb-2">
+          Loading, Your will be redirect in 59 minutes...
+        </h1>
+        <p className="text-lg text-blank opacity-80">
+          I'm kidding, you will be redirect shortly.
+        </p>
+      </div>
+    </div>
+  )
 }

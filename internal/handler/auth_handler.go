@@ -36,7 +36,6 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	code := c.Query("code")
 	tokenInfoReq, err := http.Post("https://oauth2.googleapis.com/token"+"?code="+code+"&client_id="+config.ClientID+"&client_secret="+config.ClientSecret+"&grant_type=authorization_code&redirect_uri="+config.Host+"/auth/google/callback", "", nil)
 	if err != nil {
-		fmt.Println("0")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -49,18 +48,15 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	if err := json.Unmarshal(tokenBody, &response); err != nil {
 		log.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
-	fmt.Println(response.AccessToken)
 	// ============================================
 	accountInfo, err := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v1/userinfo", nil)
 	if err != nil {
-		fmt.Println("2")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 	accountInfo.Header.Set("Authorization", "Bearer "+response.AccessToken)
 	resp, err := http.DefaultClient.Do(accountInfo)
 	if err != nil {
-		fmt.Println("3")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -68,7 +64,6 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	http.Get("https://accounts.google.com/o/oauth2/revoke?token=" + response.AccessToken)
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("4")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -86,16 +81,13 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	}
 	existingUser, err := h.AuthService.AuthRepository.GetByGoogleID(user.GoogleID)
 
-	fmt.Println("5")
 	if err != nil {
 		h.AuthService.AuthRepository.CreateUser(user)
 	} else {
 		user = existingUser
 	}
-
 	// session.Values["user_id"] = user.ID
 	// session.Save(c.Request, c.Writer)
-
 	c.JSON(http.StatusOK, gin.H{"message": "User authenticated", "user": user})
 
 }
