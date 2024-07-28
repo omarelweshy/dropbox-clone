@@ -86,8 +86,10 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	} else {
 		user = existingUser
 	}
-	// session.Values["user_id"] = user.ID
-	// session.Save(c.Request, c.Writer)
+	var store = sessions.NewCookieStore([]byte(config.SecretKey))
+	session, _ := store.Get(c.Request, "sessionid")
+	session.Values["user_id"] = user.GoogleID
+	session.Save(c.Request, c.Writer)
 	c.JSON(http.StatusOK, gin.H{"message": "User authenticated", "user": user})
 
 }
