@@ -86,10 +86,17 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	} else {
 		user = existingUser
 	}
-	var store = sessions.NewCookieStore([]byte(config.SecretKey))
-	session, _ := store.Get(c.Request, "sessionid")
-	session.Values["user_id"] = user.GoogleID
+
+	session, _ := config.Store.Get(c.Request, "sessionid")
+	session.Values["user_id"] = user.UserID
+	session.Values["authenticated"] = true
+	session.Options.Path = "/"
+	session.Options.HttpOnly = true
+	session.Options.Secure = false
+	session.Options.SameSite = http.SameSiteNoneMode
 	session.Save(c.Request, c.Writer)
+
+	fmt.Println(session)
 	c.JSON(http.StatusOK, gin.H{"message": "User authenticated", "user": user})
 
 }

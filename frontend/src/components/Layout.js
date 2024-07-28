@@ -30,7 +30,9 @@ export function Layout({ children }) {
   }
   return (
     <>
-      {showNavbar ? (
+      {!showNavbar ? (
+        <>{children}</>
+      ) : (
         <div className="min-h-full">
           <Disclosure as="nav" className="bg-gray-800">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -180,8 +182,6 @@ export function Layout({ children }) {
             </div>
           </main>
         </div>
-      ) : (
-        <>{children}</>
       )}
     </>
   )

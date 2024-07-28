@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import api from '../utils/api'
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL
 
@@ -29,22 +29,21 @@ export function LoginCallBack() {
   const code = params.get('code')
   const navigate = useNavigate()
   useEffect(() => {
-    axios
-      .get(backendUrl + '/auth/google/callback' + `?code=${code}`)
-      .then((res) => {
-        if (res.status === 200) {
-          console.log(res.data)
-          localStorage.setItem('name', res.data.user.Name)
-          localStorage.setItem('avatar', res.data.user.avatar)
-          localStorage.setItem('email', res.data.user.Email)
-          localStorage.setItem('user_id', res.data.user.UserID)
-          setTimeout(() => {
-            navigate('/')
-          }, 5000)
-        } else {
-          navigate('/login')
-        }
-      })
+    api.get('/auth/google/callback' + `?code=${code}`).then((res) => {
+      if (res.status === 200) {
+        console.log(res.data)
+        localStorage.setItem('name', res.data.user.Name)
+        localStorage.setItem('avatar', res.data.user.avatar)
+        localStorage.setItem('email', res.data.user.Email)
+        localStorage.setItem('user_id', res.data.user.UserID)
+        navigate('/')
+        // setTimeout(() => {
+        //   navigate('/')
+        // }, 5000)
+      } else {
+        navigate('/login')
+      }
+    })
   }, [code])
   return (
     <div className="bg-gradient-to-r from-white-500 to-indigo-600 flex items-center justify-center min-h-screen">

@@ -16,11 +16,13 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	authRepository := &repository.UserRepository{DB: db}
 	authService := &service.AuthService{AuthRepository: *authRepository}
 	authHandler := &handler.AuthHandler{AuthService: *authService}
+	dirHandler := &handler.DirectoryHandler{}
 
 	r := gin.Default()
 	r.Use(cors.Default())
 
 	r.Use(middleware.CORSMiddleware())
+	r.GET("/", middleware.AuthMiddleware, dirHandler.Dashboard)
 	r.GET("/auth/google/login", authHandler.GoogleLogin)
 	r.GET("/auth/google/callback", authHandler.GoogleCallback)
 	r.POST("/logout", authHandler.Logout)
