@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
-const loginUrl = process.env.REACT_APP_LOGIN_URL
+const backendUrl = process.env.REACT_APP_BACKEND_URL
 
 export function Login() {
   const handleLogin = () => {
-    window.location.href = loginUrl
+    window.location.href = backendUrl + '/auth/google/login'
   }
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -28,6 +29,15 @@ export function LoginCallBack() {
   const code = params.get('code')
   const navigate = useNavigate()
   useEffect(() => {
-    navigate('/')
+    axios
+      .get(backendUrl + '/auth/google/callback' + `?code=${code}`)
+      .then((res) => {
+        if (res.status === 200) {
+          console.log(res.data)
+          navigate('/')
+        } else {
+          navigate('/login')
+        }
+      })
   }, [code])
 }

@@ -1,22 +1,23 @@
 package handler
 
 import (
-	"context"
 	"dropbox-clone/internal/config"
 	"dropbox-clone/internal/model"
-	"dropbox-clone/internal/repository"
+	"dropbox-clone/internal/service"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	oauth2Service "google.golang.org/api/oauth2/v2"
-	"google.golang.org/api/option"
 )
 
 type AuthHandler struct {
-	userRepository repository.UserRepository
+	AuthService service.AuthService
 }
 
 func (h *AuthHandler) GoogleLogin(c *gin.Context) {
@@ -24,59 +25,76 @@ func (h *AuthHandler) GoogleLogin(c *gin.Context) {
 		RedirectURL:  config.Host + "/auth/google/callback",
 		ClientID:     config.ClientID,
 		ClientSecret: config.ClientSecret,
-		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
+		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     google.Endpoint,
 	}
-	url := googleOauthConfig.AuthCodeURL("state")
+	url := googleOauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
 func (h *AuthHandler) GoogleCallback(c *gin.Context) {
-	var store = sessions.NewCookieStore([]byte(config.SecretKey))
-	var googleOauthConfig = &oauth2.Config{
-		RedirectURL:  config.Host + "/callback",
-		ClientID:     config.ClientID,
-		ClientSecret: config.ClientSecret,
-		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
-		Endpoint:     google.Endpoint,
-	}
-	state := c.Query("state")
-	session, _ := store.Get(c.Request, "sessionid")
-	if state != session.Values["state"] {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
 	code := c.Query("code")
-	token, err := googleOauthConfig.Exchange(context.Background(), code)
+	tokenInfoReq, err := http.Post("https://oauth2.googleapis.com/token"+"?code="+code+"&client_id="+config.ClientID+"&client_secret="+config.ClientSecret+"&grant_type=authorization_code&redirect_uri="+config.Host+"/auth/google/callback", "", nil)
 	if err != nil {
+		fmt.Println("0")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	oauth2Service, err := oauth2Service.NewService(context.Background(), option.WithTokenSource(oauth2.StaticTokenSource(token)))
+	defer tokenInfoReq.Body.Close()
+	tokenBody, err := ioutil.ReadAll(tokenInfoReq.Body)
 	if err != nil {
+		log.Fatalf("Failed to read response body: %v", err)
+	}
+	var response model.GoogleTokenResponse
+	if err := json.Unmarshal(tokenBody, &response); err != nil {
+		log.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+	fmt.Println(response.AccessToken)
+	// ============================================
+	accountInfo, err := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v1/userinfo", nil)
+	if err != nil {
+		fmt.Println("2")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	userinfoService := oauth2Service.Userinfo.V2.Me
-	userinfo, err := userinfoService.Get().Do()
+	accountInfo.Header.Set("Authorization", "Bearer "+response.AccessToken)
+	resp, err := http.DefaultClient.Do(accountInfo)
 	if err != nil {
+		fmt.Println("3")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	defer resp.Body.Close()
+	http.Get("https://accounts.google.com/o/oauth2/revoke?token=" + response.AccessToken)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("4")
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	var userInfo model.GoogleUser
+	if err := json.Unmarshal(body, &userInfo); err != nil {
+		fmt.Println("Error unmarshaling JSON:", err)
+		return
+	}
+
 	user := &model.User{
-		GoogleID: userinfo.Id,
-		Email:    userinfo.Email,
-		Name:     userinfo.Name,
-		Avatar:   userinfo.Picture,
+		GoogleID: userInfo.GoogleID,
+		Email:    userInfo.Email,
+		Name:     userInfo.Name,
+		Avatar:   userInfo.Avatar,
 	}
-	existingUser, err := h.userRepository.GetByGoogleID(user.GoogleID)
+	existingUser, err := h.AuthService.AuthRepository.GetByGoogleID(user.GoogleID)
+
+	fmt.Println("5")
 	if err != nil {
-		h.userRepository.CreateUser(user)
+		h.AuthService.AuthRepository.CreateUser(user)
 	} else {
 		user = existingUser
 	}
+
 	// session.Values["user_id"] = user.ID
-	session.Save(c.Request, c.Writer)
+	// session.Save(c.Request, c.Writer)
 
 	c.JSON(http.StatusOK, gin.H{"message": "User authenticated", "user": user})
 

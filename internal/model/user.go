@@ -12,3 +12,14 @@ type User struct {
 	Avatar    string `json:"avatar"`
 	CreatedAt time.Time
 }
+
+type GoogleTokenResponse struct {
+	AccessToken string `json:"access_token"`
+}
+
+type GoogleUser struct {
+	GoogleID string `json:"id"`
+	Email    string `json:"email"`
+	Name     string `json:"name"`
+	Avatar   string `json:"picture"`
+}
