@@ -10,8 +10,8 @@ import {
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useLocation } from 'react-router-dom'
 
-const navigation = [{ name: 'Dashboard', href: '#', current: true }]
-const userNavigation = [{ name: 'Sign out', href: '/login' }]
+const navigation = [{ name: 'Dashboard', href: '/', current: true }]
+const userNavigation = [{ name: 'Sign out', href: '/auth/logout' }]
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')

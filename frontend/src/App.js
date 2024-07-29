@@ -1,6 +1,6 @@
 import { Layout } from './components/Layout'
 import { Home } from './components/Home'
-import { Login, LoginCallBack } from './components/Login'
+import { Login, LoginCallBack, Logout } from './components/Login'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 function App() {
@@ -11,6 +11,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/auth/google/callback" element={<LoginCallBack />} />
+          <Route path="/auth/logout" element={<Logout />} />
         </Routes>
       </Layout>
     </Router>

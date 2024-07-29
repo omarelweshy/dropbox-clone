@@ -59,3 +59,16 @@ export function LoginCallBack() {
     </div>
   )
 }
+
+export function Logout() {
+  const navigate = useNavigate()
+  useEffect(() => {
+    api.get('/auth/logout').then((res) => {
+      localStorage.removeItem('name')
+      localStorage.removeItem('avatar')
+      localStorage.removeItem('email')
+      localStorage.removeItem('user_id')
+      navigate('/login')
+    })
+  }, [])
+}
