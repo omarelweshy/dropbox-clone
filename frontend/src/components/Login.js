@@ -36,10 +36,9 @@ export function LoginCallBack() {
         localStorage.setItem('avatar', res.data.user.avatar)
         localStorage.setItem('email', res.data.user.Email)
         localStorage.setItem('user_id', res.data.user.UserID)
-        navigate('/')
-        // setTimeout(() => {
-        //   navigate('/')
-        // }, 5000)
+        setTimeout(() => {
+          navigate('/')
+        }, 5000)
       } else {
         navigate('/login')
       }
@@ -53,7 +52,7 @@ export function LoginCallBack() {
           Loading, Your will be redirect in 59 minutes...
         </h1>
         <p className="text-lg text-blank opacity-80">
-          I'm kidding, you will be redirect shortly.
+          I'm kidding 💀, you will be redirect shortly.
         </p>
       </div>
     </div>
