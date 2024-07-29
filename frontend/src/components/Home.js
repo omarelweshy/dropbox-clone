@@ -3,7 +3,7 @@ import api from '../utils/api'
 
 export function Home() {
   useEffect(() => {
-    api.get('/')
+    api.get('/').then((res) => res.data)
   }, [])
   return <>Hey</>
 }

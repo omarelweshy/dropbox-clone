@@ -40,9 +40,9 @@ export function Layout({ children }) {
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <img
-                      alt="Your Company"
-                      src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                      className="h-8 w-8"
+                      alt="My Box"
+                      src="https://pngimg.com/uploads/box/box_PNG2.png"
+                      className="h-10 w-10"
                     />
                   </div>
                   <div className="hidden md:block">
