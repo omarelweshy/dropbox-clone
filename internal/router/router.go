@@ -25,7 +25,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	r.GET("/", middleware.AuthMiddleware, dirHandler.Dashboard)
 	r.GET("/auth/google/login", authHandler.GoogleLogin)
 	r.GET("/auth/google/callback", authHandler.GoogleCallback)
-	r.POST("/logout", authHandler.Logout)
+	r.GET("/auth/logout", authHandler.Logout)
 
 	return r
 }

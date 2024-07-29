@@ -1,16 +1,14 @@
 package middleware
 
 import (
-	"dropbox-clone/internal/config"
-	"fmt"
+	store "dropbox-clone/internal/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func AuthMiddleware(c *gin.Context) {
-	session, _ := config.Store.Get(c.Request, "sessionid")
-	fmt.Println(session)
+	session, _ := store.GetSession(c.Request)
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return

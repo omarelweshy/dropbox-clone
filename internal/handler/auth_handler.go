@@ -4,6 +4,7 @@ import (
 	"dropbox-clone/internal/config"
 	"dropbox-clone/internal/model"
 	"dropbox-clone/internal/service"
+	store "dropbox-clone/internal/utils"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,7 +12,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -86,24 +86,21 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	} else {
 		user = existingUser
 	}
-
-	session, _ := config.Store.Get(c.Request, "sessionid")
+	session, _ := store.GetSession(c.Request)
 	session.Values["user_id"] = user.UserID
 	session.Values["authenticated"] = true
-	session.Options.Path = "/"
-	session.Options.HttpOnly = true
-	session.Options.Secure = false
-	session.Options.SameSite = http.SameSiteNoneMode
-	session.Save(c.Request, c.Writer)
 
-	fmt.Println(session)
+	if err := session.Save(c.Request, c.Writer); err != nil {
+		log.Printf("Error saving session: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+		return
+	}
+	fmt.Println(session.Options.Domain)
 	c.JSON(http.StatusOK, gin.H{"message": "User authenticated", "user": user})
-
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
-	var store = sessions.NewCookieStore([]byte(config.SecretKey))
-	session, _ := store.Get(c.Request, "sessionid")
+	session, _ := store.GetSession(c.Request)
 	session.Options.MaxAge = -1
 	session.Save(c.Request, c.Writer)
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out"})

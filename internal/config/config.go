@@ -4,10 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/antonlindstrom/pgstore"
 	"github.com/joho/godotenv"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 var (
@@ -17,8 +14,7 @@ var (
 	ClientSecret string
 	Port         string
 	DBUrl        string
-	DB           *gorm.DB
-	Store        *pgstore.PGStore
+	SessionKey   string
 )
 
 func LoadConfig() {
@@ -33,16 +29,7 @@ func LoadConfig() {
 	ClientID = os.Getenv("CLIENT_ID")
 	ClientSecret = os.Getenv("CLIENT_SECRET")
 
-	DB, err = gorm.Open(postgres.Open(DBUrl), &gorm.Config{})
-	if err != nil {
-		log.Fatalf("Failed to connect to session store: %v", err)
-	}
-
-	Store, err = pgstore.NewPGStore(DBUrl, []byte(SecretKey))
-	if err != nil {
-		log.Fatalf("Failed to connect to session store: %v", err)
-	}
-	defer Store.Close()
+	SessionKey = os.Getenv("SECRET_KEY")
 
 	if ClientID == "" || ClientSecret == "" {
 		log.Fatalf("ClientID or ClientSecret is not set")
