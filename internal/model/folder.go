@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-type Directory struct {
+type Folder struct {
 	UserID    uint   `gorm:"primaryKey"`
 	Name      string `gorm:"not null"`
 	CreatedAt time.Time
