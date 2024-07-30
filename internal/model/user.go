@@ -5,11 +5,11 @@ import (
 )
 
 type User struct {
-	UserID    uint   `gorm:"primaryKey"`
+	ID        uint   `gorm:"primaryKey"`
 	GoogleID  string `gorm:"uniqueIndex"`
 	Name      string `gorm:"not null"`
 	Email     string `gorm:"unique;not null"`
-	Avatar    string `json:"avatar"`
+	Avatar    string `gorm:"not null"`
 	CreatedAt time.Time
 }
 

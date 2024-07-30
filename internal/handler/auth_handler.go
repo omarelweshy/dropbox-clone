@@ -87,7 +87,7 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 		user = existingUser
 	}
 	session, _ := store.GetSession(c.Request)
-	session.Values["user_id"] = user.UserID
+	session.Values["user_id"] = user.ID
 	session.Values["authenticated"] = true
 
 	if err := session.Save(c.Request, c.Writer); err != nil {

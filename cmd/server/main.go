@@ -5,8 +5,6 @@ import (
 	"dropbox-clone/internal/model"
 	"dropbox-clone/internal/router"
 	store "dropbox-clone/internal/utils"
-	util "dropbox-clone/internal/utils"
-	"fmt"
 	"log"
 
 	"gorm.io/driver/postgres"
@@ -28,13 +26,15 @@ func main() {
 
 	store.InitializeStore([]byte(config.SessionKey))
 
-	fmt.Println(util.GenerateRandomString(20))
-
 	if err != nil {
 		log.Fatalf("Failed to create PGStore: %v", err)
 	}
 
-	db.AutoMigrate(&model.User{})
+	err = db.AutoMigrate(&model.User{}, &model.Folder{})
+	if err != nil {
+		log.Fatalf("failed to migrate models: %v", err)
+	}
+
 	r := router.SetupRouter(db)
 	if err := r.Run(":" + config.Port); err != nil {
 		log.Fatal(err)
