@@ -24,3 +24,12 @@ func (r *UserRepository) GetByGoogleID(googleID string) (*model.User, error) {
 	}
 	return &user, nil
 }
+
+func (r *UserRepository) GetByID(id uint) (*model.User, error) {
+	var user model.User
+	result := r.DB.Where("user_id = ?", id).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}

@@ -31,11 +31,6 @@ export function LoginCallBack() {
   useEffect(() => {
     api.get('/auth/google/callback' + `?code=${code}`).then((res) => {
       if (res.status === 200) {
-        console.log(res.data)
-        localStorage.setItem('name', res.data.user.Name)
-        localStorage.setItem('avatar', res.data.user.avatar)
-        localStorage.setItem('email', res.data.user.Email)
-        localStorage.setItem('user_id', res.data.user.UserID)
         setTimeout(() => {
           navigate('/')
         }, 5000)
@@ -63,10 +58,6 @@ export function Logout() {
   const navigate = useNavigate()
   useEffect(() => {
     api.get('/auth/logout').then((res) => {
-      localStorage.removeItem('name')
-      localStorage.removeItem('avatar')
-      localStorage.removeItem('email')
-      localStorage.removeItem('user_id')
       navigate('/login')
     })
   }, [])

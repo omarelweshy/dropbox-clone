@@ -95,8 +95,22 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 		return
 	}
-	fmt.Println(session.Options.Domain)
 	c.JSON(http.StatusOK, gin.H{"message": "User authenticated", "user": user})
+}
+
+func (h *AuthHandler) Me(c *gin.Context) {
+	session, _ := store.GetSession(c.Request)
+	userID, ok := session.Values["user_id"].(uint)
+	if !ok {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	user, err := h.AuthService.AuthRepository.GetByID(userID)
+	if err != nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"name": user.Name, "email": user.Email, "avatar": user.Avatar})
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {

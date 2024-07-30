@@ -8,6 +8,8 @@ import {
   MenuItems,
 } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useEffect, useState } from 'react'
+import api from '../utils/api'
 import { useLocation } from 'react-router-dom'
 
 const navigation = [{ name: 'Dashboard', href: '/', current: true }]
@@ -22,12 +24,24 @@ export function Layout({ children }) {
   const showNavbar = !['/login', '/auth/google/callback'].includes(
     location.pathname
   )
+  const [name, setName] = useState(null)
+  const [email, setEmail] = useState(null)
+  const [avatar, setAvatar] = useState(null)
 
-  const user = {
-    name: localStorage.getItem('name'),
-    email: localStorage.getItem('email'),
-    imageUrl: localStorage.getItem('avatar'),
-  }
+  useEffect(() => {
+    if (showNavbar) {
+      if (name == null || email == null || avatar == null) {
+        api.get('/auth/me').then((res) => {
+          if (res.status === 200) {
+            setName(res.data.name ?? '')
+            setEmail(res.data.email ?? '')
+            setAvatar(res.data.avatar ?? '')
+          }
+        })
+      }
+    }
+  }, [showNavbar])
+
   return (
     <>
       {!showNavbar ? (
@@ -75,7 +89,7 @@ export function Layout({ children }) {
                           <span className="sr-only">Open user menu</span>
                           <img
                             alt=""
-                            src={user.imageUrl}
+                            src={avatar}
                             className="h-8 w-8 rounded-full"
                           />
                         </MenuButton>
@@ -140,16 +154,16 @@ export function Layout({ children }) {
                   <div className="flex-shrink-0">
                     <img
                       alt=""
-                      src={user.imageUrl}
+                      src={avatar}
                       className="h-10 w-10 rounded-full"
                     />
                   </div>
                   <div className="ml-3">
                     <div className="text-base font-medium leading-none text-white">
-                      {user.name}
+                      {name}
                     </div>
                     <div className="text-sm font-medium leading-none text-gray-400">
-                      {user.email}
+                      {email}
                     </div>
                   </div>
                 </div>
