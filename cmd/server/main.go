@@ -30,7 +30,7 @@ func main() {
 		log.Fatalf("Failed to create PGStore: %v", err)
 	}
 
-	err = db.AutoMigrate(&model.User{}, &model.Folder{})
+	err = db.AutoMigrate(&model.User{}, &model.Folder{}, &model.File{})
 	if err != nil {
 		log.Fatalf("failed to migrate models: %v", err)
 	}

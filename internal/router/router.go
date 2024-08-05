@@ -30,5 +30,6 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	// Folders routers
 	r.GET("/", middleware.AuthMiddleware, folderHandler.Dashboard)
+	r.POST("/folder", middleware.AuthMiddleware, folderHandler.Dashboard)
 	return r
 }
