@@ -5,6 +5,7 @@ import (
 	"dropbox-clone/internal/middleware"
 	"dropbox-clone/internal/repository"
 	"dropbox-clone/internal/service"
+	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -16,9 +17,12 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	authRepository := &repository.UserRepository{DB: db}
 	authService := &service.AuthService{AuthRepository: *authRepository}
 	authHandler := &handler.AuthHandler{AuthService: *authService}
-	folderHandler := &handler.FolderHandler{}
+	// folderHandler := &handler.FolderHandler{}
 
 	r := gin.Default()
+	r.Static("/static", "./internal/static")
+	r.LoadHTMLGlob("internal/templates/*")
+
 	r.Use(cors.Default())
 	r.Use(middleware.CORSMiddleware())
 
@@ -29,6 +33,11 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	r.GET("/auth/logout", authHandler.Logout)
 
 	// Folders routers
-	r.GET("/", middleware.AuthMiddleware, folderHandler.Dashboard)
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.templ", nil)
+	})
+	r.GET("/login", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.templ", nil)
+	})
 	return r
 }
