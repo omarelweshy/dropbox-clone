@@ -33,7 +33,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	r.GET("/auth/logout", authHandler.Logout)
 
 	// Folders routers
-	r.GET("/", func(c *gin.Context) {
+	r.GET("/", middleware.AuthMiddleware, func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.templ", nil)
 	})
 	r.GET("/login", func(c *gin.Context) {
