@@ -1,25 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ .Title }}</title>
-    <link rel="stylesheet" href="/static/css/styles.css" />
-    <script src="/static/js/scripts.js"></script>
-    <script src="https://unpkg.com/htmx.org@1.8.4"></script>
-  </head>
-  <body>
-    <header>
-      <h1>My Website</h1>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/about">About</a>
-        <a href="/contact">Contact</a>
-      </nav>
-    </header>
-    <main>{{ block "content" . }}{{ end }}</main>
-    <footer>
-      <p>© 2024 My Website</p>
-    </footer>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>    
+    <script src="https://unpkg.com/htmx.org@2.0.1"></script>
+    <script src="static/js/layout.js"></script>
+     <title>{{ .Title }}</title>
+</head>
+<body class="bg-white text-gray-800">
+    <nav class="bg-gray-800 text-gray-300">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <img
+                            alt="My Box"
+                            src="https://pngimg.com/uploads/box/box_PNG2.png"
+                            class="h-10 w-10"
+                        />
+                    </div>
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="/" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Home</a>
+                    </div>
+                </div>
+                <div class="ml-4 flex items-center space-x-4">
+                    <span class="text-gray-300">Hi, {{.user.Name}}!</span>
+                    <div class="relative">
+                        <button class="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="user-menu-button">
+                            <img
+                                alt="User Avatar"
+                                id="user-avatar"
+                                src="{{.user.Avatar}}" 
+                                class="h-8 w-8 rounded-full"
+                            />
+                        </button>
+                         <div class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 hidden" id="user-menu">
+                            <a href="/auth/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="bg-white p-6 rounded-lg shadow-md text-gray-800">
+            <h1 class="text-3xl font-bold mb-4">{{ .Header }}</h1>
+            {{ block "content" . }}{{ end }}
+        </div>
+    </main>
+</body>
 </html>

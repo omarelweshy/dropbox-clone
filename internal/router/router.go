@@ -27,17 +27,14 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	r.Use(middleware.CORSMiddleware())
 
 	// Auth routers
-	r.GET("/auth/me", middleware.AuthMiddleware, authHandler.Me)
+	r.GET("/login", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.templ", nil)
+	})
 	r.GET("/auth/google/login", authHandler.GoogleLogin)
 	r.GET("/auth/google/callback", authHandler.GoogleCallback)
 	r.GET("/auth/logout", authHandler.Logout)
 
-	// Folders routers
-	r.GET("/", middleware.AuthMiddleware, func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.templ", nil)
-	})
-	r.GET("/login", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login.templ", nil)
-	})
+	// Pages
+	r.GET("/", middleware.AuthMiddleware, authHandler.Home)
 	return r
 }
