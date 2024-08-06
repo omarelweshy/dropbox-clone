@@ -95,10 +95,12 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "User authenticated", "user": user})
+	c.Redirect(http.StatusFound, "/")
+	c.Abort()
+	return
 }
 
-func (h *AuthHandler) Me(c *gin.Context) {
+func (h *AuthHandler) Home(c *gin.Context) {
 	session, _ := store.GetSession(c.Request)
 	userID, ok := session.Values["user_id"].(uint)
 	if !ok {
@@ -110,12 +112,19 @@ func (h *AuthHandler) Me(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"name": user.Name, "email": user.Email, "avatar": user.Avatar})
+	c.HTML(http.StatusOK, "layout.templ", gin.H{
+		"Title":   "Home",
+		"Header":  "Home",
+		"content": "index.templ",
+		"user":    user,
+	})
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
 	session, _ := store.GetSession(c.Request)
 	session.Options.MaxAge = -1
 	session.Save(c.Request, c.Writer)
-	c.JSON(http.StatusOK, gin.H{"message": "Logged out"})
+	c.Redirect(http.StatusFound, "/login")
+	c.Abort()
+	return
 }
