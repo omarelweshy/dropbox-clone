@@ -3,6 +3,8 @@ package util
 import (
 	"math/rand"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -14,4 +16,8 @@ func GenerateRandomString(length int) string {
 		b[i] = charset[seededRand.Intn(len(charset))]
 	}
 	return string(b)
+}
+
+func GenerateUUID() string {
+	return uuid.New().String()
 }

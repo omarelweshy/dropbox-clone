@@ -3,7 +3,7 @@ package model
 import "time"
 
 type Folder struct {
-	ID        uint   `gorm:"primaryKey"`
+	ID        string `gorm:"primaryKey"`
 	Name      string `gorm:"not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time

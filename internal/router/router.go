@@ -17,7 +17,10 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	authRepository := &repository.UserRepository{DB: db}
 	authService := &service.AuthService{AuthRepository: *authRepository}
 	authHandler := &handler.AuthHandler{AuthService: *authService}
-	// folderHandler := &handler.FolderHandler{}
+
+	folderRepository := &repository.FolderRepository{DB: db}
+	folderService := &service.FolderService{FolderRepository: *folderRepository}
+	folderHandler := &handler.FolderHandler{FolderService: *folderService}
 
 	r := gin.Default()
 	r.Static("/static", "./internal/static")
@@ -36,5 +39,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	// Pages
 	r.GET("/", middleware.AuthMiddleware, authHandler.Home)
+
+	// Folder routes
+	r.POST("/folder/create", folderHandler.CreateFolder)
 	return r
 }
