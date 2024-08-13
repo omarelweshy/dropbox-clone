@@ -11,19 +11,22 @@ type FolderService struct {
 	FolderRepository repository.FolderRepository
 }
 
-var (
-	ErrFolderExists = errors.New("Folder already taken")
-)
+func (s *FolderService) CreateFolder(user_id uint, name string, parentID *string) (*model.Folder, error) {
+	folder, err := s.FolderRepository.GetFolderByNameAndParentID(user_id, name, parentID)
+	if folder != nil {
+		return nil, errors.New("Folder already exists")
+	}
+	// Return any other error
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
 
-func (s *FolderService) CreateFolder(name string) error {
-	_, err := s.FolderRepository.GetFolderByName(name)
-	if err == nil {
-		return ErrFolderExists
+	// Create a new folder happily and return it if ok or error
+	newFolder := model.Folder{
+		ID:       util.GenerateUUID(),
+		ParentID: parentID,
+		Name:     name,
+		UserID:   1,
 	}
-	folder := model.Folder{
-		ID:     util.GenerateUUID(),
-		Name:   name,
-		UserID: 1,
-	}
-	return s.FolderRepository.CreateFolder(&folder)
+	return s.FolderRepository.CreateFolder(&newFolder)
 }

@@ -4,7 +4,6 @@ import (
 	"dropbox-clone/internal/form"
 	"dropbox-clone/internal/service"
 	util "dropbox-clone/internal/utils"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,17 +24,15 @@ func (h *FolderHandler) CreateFolder(c *gin.Context) {
 			return
 		}
 	}
-	err := h.FolderService.CreateFolder(form.Name)
 
+	folder, err := h.FolderService.CreateFolder(1, form.Name, form.ParentID)
 	if err != nil {
-		fmt.Println(err.Error)
-		util.RespondWithError(c, http.StatusInternalServerError, "could not", nil)
+		util.RespondWithError(c, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	util.RespondWithSuccess(c, "user data", gin.H{
-		// "firstName": user.FirstName,
-		// "lastName":  user.LastName,
-		// "username":  user.Username,
-		// "email":     user.Email,
+
+	util.RespondWithSuccess(c, "Folder Created", gin.H{
+		"id":   folder.ID,
+		"name": folder.Name,
 	})
 }

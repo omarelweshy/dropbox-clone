@@ -8,5 +8,7 @@ type Folder struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	UserID    uint
-	User      User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	User      User    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	ParentID  *string `gorm:"type:uuid;"`
+	Parent    *Folder `gorm:"foreignKey:ParentID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
