@@ -10,11 +10,11 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type FolderHandler struct {
-	FolderService service.FolderService
+type NodeHandler struct {
+	NodeService service.NodeService
 }
 
-func (h *FolderHandler) CreateFolder(c *gin.Context) {
+func (h *NodeHandler) CreateFolder(c *gin.Context) {
 	var form form.CreateFolderForm
 
 	if err := c.ShouldBindJSON(&form); err != nil {
@@ -25,7 +25,7 @@ func (h *FolderHandler) CreateFolder(c *gin.Context) {
 		}
 	}
 
-	folder, err := h.FolderService.CreateFolder(1, form.Name, form.ParentID)
+	folder, err := h.NodeService.CreateNode("folder", 1, form.Name, form.ParentID)
 	if err != nil {
 		util.RespondWithError(c, http.StatusBadRequest, err.Error(), nil)
 		return
@@ -34,5 +34,33 @@ func (h *FolderHandler) CreateFolder(c *gin.Context) {
 	util.RespondWithSuccess(c, "Folder Created", gin.H{
 		"id":   folder.ID,
 		"name": folder.Name,
+	})
+}
+
+func (h *NodeHandler) ListFolder(c *gin.Context) {
+	id := c.Param("id")
+	var parentID *string
+	if id != "" {
+		parentID = &id
+	} else {
+		parentID = nil
+	}
+	folders, _ := h.NodeService.ListNode("folder", 1, parentID)
+
+	var folderResponses []*form.NodeResponse
+	for _, folder := range folders {
+		folderResponses = append(folderResponses, &form.NodeResponse{
+			ID:        folder.ID,
+			UserID:    folder.UserID,
+			ParentID:  folder.ParentID,
+			Type:      "folder",
+			Name:      folder.Name,
+			CreatedAt: folder.CreatedAt,
+			UpdatedAt: folder.UpdatedAt,
+		})
+	}
+
+	util.RespondWithSuccess(c, "Listing Folders", gin.H{
+		"folders": folderResponses,
 	})
 }
