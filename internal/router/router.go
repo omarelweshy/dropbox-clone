@@ -40,16 +40,10 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// Pages
 	r.GET("/", middleware.AuthMiddleware, authHandler.Home)
 
-	// Folder routes
-	r.POST("/folder/create", nodeHandler.CreateFolder)
-	r.GET("/folder", nodeHandler.ListFolder)
-	r.GET("/folder/", nodeHandler.ListFolder)
-	r.GET("/folder/:id", nodeHandler.ListFolder)
+	r.POST("/node/create", nodeHandler.CreateNode)
+	r.GET("/node", nodeHandler.ListNode)
+	r.GET("/node/", nodeHandler.ListNode)
+	r.GET("/node/:id", nodeHandler.ListNode)
 
-	// File routes
-	// r.POST("/folder/create", nodeHandler.CreateFolder)
-	// r.GET("/folder", nodeHandler.ListFolder)
-	// r.GET("/folder/", nodeHandler.ListFolder)
-	// r.GET("/folder/:id", nodeHandler.ListFolder)
 	return r
 }

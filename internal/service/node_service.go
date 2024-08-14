@@ -5,6 +5,7 @@ import (
 	"dropbox-clone/internal/repository"
 	util "dropbox-clone/internal/utils"
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -13,6 +14,7 @@ type NodeService struct {
 }
 
 func (s *NodeService) CreateNode(nodeType string, user_id uint, name string, parentID *string) (*model.Node, error) {
+	fmt.Println(nodeType)
 	node, err := s.NodeRepository.GetNodeByTypeAndNameAndParentID(nodeType, user_id, name, parentID)
 	if node != nil {
 		return nil, errors.New(strings.Title(nodeType) + " " + name + " already exists")
@@ -44,6 +46,6 @@ func (s *NodeService) CreateNode(nodeType string, user_id uint, name string, par
 	return createdNode, nil
 }
 
-func (s *NodeService) ListNode(nodeType string, user_id uint, parentID *string) ([]*model.Node, error) {
-	return s.NodeRepository.ListNodes(nodeType, user_id, parentID)
+func (s *NodeService) ListNode(user_id uint, parentID *string) ([]*model.Node, error) {
+	return s.NodeRepository.ListNodes(user_id, parentID)
 }

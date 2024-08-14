@@ -27,16 +27,18 @@ func (r *NodeRepository) UpdateNode(node *model.Node) error {
 	return r.DB.Save(node).Error
 }
 
-func (r *NodeRepository) ListNodes(nodeType string, userID uint, parentID *string) ([]*model.Node, error) {
+func (r *NodeRepository) ListNodes(userID uint, parentID *string) ([]*model.Node, error) {
 	var nodes []*model.Node
-	query := r.DB.Where("type = ? AND user_id = ?", nodeType, userID)
+	query := r.DB.Where("user_id = ?", userID)
 	if parentID == nil {
 		query = query.Where("parent_id IS NULL")
 	} else {
 		query = query.Where("parent_id = ?", parentID)
 	}
-
 	if err := query.Find(&nodes).Error; err != nil {
+		return nil, err
+	}
+	if err := query.Preload("Children").Find(&nodes).Error; err != nil {
 		return nil, err
 	}
 	return nodes, nil
