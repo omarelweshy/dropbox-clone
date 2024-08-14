@@ -45,7 +45,12 @@ func (h *NodeHandler) ListNode(c *gin.Context) {
 	} else {
 		parentID = nil
 	}
-	nodes, _ := h.NodeService.ListNode(1, parentID)
+	nodes, err := h.NodeService.ListNode(1, parentID)
+
+	if err != nil {
+		util.RespondWithError(c, 404, err.Error(), nil)
+		return
+	}
 
 	var nodeResponses []*form.NodeResponse
 	for _, node := range nodes {
