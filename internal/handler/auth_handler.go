@@ -100,26 +100,6 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	return
 }
 
-func (h *AuthHandler) Home(c *gin.Context) {
-	session, _ := store.GetSession(c.Request)
-	userID, ok := session.Values["user_id"].(uint)
-	if !ok {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-	user, err := h.AuthService.AuthRepository.GetByID(userID)
-	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-	c.HTML(http.StatusOK, "layout.templ", gin.H{
-		"Title":   "Home",
-		"Header":  "Home",
-		"content": "index.templ",
-		"user":    user,
-	})
-}
-
 func (h *AuthHandler) Logout(c *gin.Context) {
 	session, _ := store.GetSession(c.Request)
 	session.Options.MaxAge = -1

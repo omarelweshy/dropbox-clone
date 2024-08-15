@@ -38,8 +38,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	r.GET("/auth/logout", authHandler.Logout)
 
 	// Pages
-	r.GET("/", middleware.AuthMiddleware, authHandler.Home)
+	r.GET("/", middleware.AuthMiddleware(authService), nodeHandler.Home)
 
+	// Node endpoints
 	r.POST("/node/create", nodeHandler.CreateNode)
 	r.GET("/node", nodeHandler.ListNode)
 	r.GET("/node/", nodeHandler.ListNode)

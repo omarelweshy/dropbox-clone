@@ -38,9 +38,6 @@ func (r *NodeRepository) ListNodes(userID uint, parentID *string) ([]*model.Node
 	if err := query.Find(&nodes).Error; err != nil {
 		return nil, err
 	}
-	if err := query.Preload("Children").Find(&nodes).Error; err != nil {
-		return nil, err
-	}
 	return nodes, nil
 }
 
