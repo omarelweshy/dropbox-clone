@@ -59,8 +59,8 @@ func (h *NodeHandler) ListNode(c *gin.Context) {
 			ParentID:  node.ParentID,
 			Type:      string(node.Type),
 			Name:      node.Name,
-			CreatedAt: node.CreatedAt,
-			UpdatedAt: node.UpdatedAt,
+			CreatedAt: util.FormatDateTime(node.CreatedAt),
+			UpdatedAt: util.FormatDateTime(node.UpdatedAt),
 		})
 	}
 
@@ -74,10 +74,21 @@ func (h *NodeHandler) Home(c *gin.Context) {
 	userIDUint, _ := userID.(uint)
 
 	nodes, _ := h.NodeService.ListNode(userIDUint, nil)
+	var nodeResponses []*form.NodeResponse
+	for _, node := range nodes {
+		nodeResponses = append(nodeResponses, &form.NodeResponse{
+			ID:        node.ID,
+			ParentID:  node.ParentID,
+			Type:      string(node.Type),
+			Name:      node.Name,
+			CreatedAt: util.FormatDateTime(node.CreatedAt),
+			UpdatedAt: util.FormatDateTime(node.UpdatedAt),
+		})
+	}
 
 	util.RenderLayout(c, "index.templ", gin.H{
 		"Title":  "Home",
 		"Header": "All Files",
-		"nodes":  nodes,
+		"Nodes":  nodeResponses,
 	})
 }

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -20,4 +21,22 @@ func GenerateRandomString(length int) string {
 
 func GenerateUUID() string {
 	return uuid.New().String()
+}
+
+func FormatDateTime(t time.Time) string {
+	day := t.Day()
+
+	suffix := "th"
+	if day%10 == 1 && day != 11 {
+		suffix = "st"
+	} else if day%10 == 2 && day != 12 {
+		suffix = "nd"
+	} else if day%10 == 3 && day != 13 {
+		suffix = "rd"
+	}
+
+	formattedDate := t.Format("Jan 2") + suffix + ", " + t.Format("2006 03:04 PM")
+	fmt.Println(formattedDate)
+
+	return formattedDate
 }

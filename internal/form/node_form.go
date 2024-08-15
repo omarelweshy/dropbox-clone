@@ -1,9 +1,5 @@
 package form
 
-import (
-	"time"
-)
-
 type CreateNodeForm struct {
 	Name     string  `json:"name,binding:required"`
 	Type     string  `json:"Type,binding:required"`
@@ -16,8 +12,8 @@ type NodeResponse struct {
 	Name      string          `json:"Name"`
 	Type      string          `json:"Type"`
 	Children  []*NodeResponse `json:"Children,omitempty"`
-	CreatedAt time.Time       `json:"CreatedAt"`
-	UpdatedAt time.Time       `json:"UpdatedAt"`
+	CreatedAt string          `json:"CreatedAt"`
+	UpdatedAt string          `json:"UpdatedAt"`
 	FileSize  *int64          `json:"FileSize"`
 	FileType  *string         `json:"FileType"`
 }
