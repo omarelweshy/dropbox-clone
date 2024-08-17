@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -36,7 +35,6 @@ func FormatDateTime(t time.Time) string {
 	}
 
 	formattedDate := t.Format("Jan 2") + suffix + ", " + t.Format("2006 03:04 PM")
-	fmt.Println(formattedDate)
 
 	return formattedDate
 }

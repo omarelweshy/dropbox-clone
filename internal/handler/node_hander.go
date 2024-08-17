@@ -81,6 +81,8 @@ func (h *NodeHandler) Home(c *gin.Context) {
 			ParentID:  node.ParentID,
 			Type:      string(node.Type),
 			Name:      node.Name,
+			FileSize:  node.FileSize,
+			FileType:  node.FileType,
 			CreatedAt: util.FormatDateTime(node.CreatedAt),
 			UpdatedAt: util.FormatDateTime(node.UpdatedAt),
 		})

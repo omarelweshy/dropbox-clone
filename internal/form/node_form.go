@@ -14,6 +14,6 @@ type NodeResponse struct {
 	Children  []*NodeResponse `json:"Children,omitempty"`
 	CreatedAt string          `json:"CreatedAt"`
 	UpdatedAt string          `json:"UpdatedAt"`
-	FileSize  *int64          `json:"FileSize"`
-	FileType  *string         `json:"FileType"`
+	FileSize  int64           `json:"FileSize"`
+	FileType  string          `json:"FileType"`
 }
