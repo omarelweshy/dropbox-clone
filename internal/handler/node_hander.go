@@ -28,7 +28,7 @@ func (h *NodeHandler) CreateNode(c *gin.Context) {
 
 	node, err := h.NodeService.CreateNode(Type, userIDUint, Name, parentID)
 	if err != nil {
-		util.RespondWithError(c, http.StatusBadRequest, err.Error(), nil)
+		util.RespondWithError(c, http.StatusBadRequest, err.Error(), parentID)
 		return
 	}
 
@@ -90,8 +90,9 @@ func (h *NodeHandler) Home(c *gin.Context) {
 	}
 
 	util.RenderLayout(c, "index.templ", gin.H{
-		"Title":  "Home",
-		"Header": "All Files",
-		"Nodes":  nodeResponses,
+		"Title":    "Home",
+		"Header":   "All Files",
+		"ParentID": nil,
+		"Nodes":    nodeResponses,
 	})
 }
