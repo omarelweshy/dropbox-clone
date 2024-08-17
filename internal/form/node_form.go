@@ -1,9 +1,9 @@
 package form
 
 type CreateNodeForm struct {
-	Name     string  `json:"name,binding:required"`
+	Name     string  `json:"Name,binding:required"`
 	Type     string  `json:"Type,binding:required"`
-	ParentID *string `json:"parentID,omitempty"`
+	ParentID *string `json:"ParentID,omitempty"`
 }
 
 type NodeResponse struct {

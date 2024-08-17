@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 type NodeHandler struct {
@@ -15,17 +14,19 @@ type NodeHandler struct {
 }
 
 func (h *NodeHandler) CreateNode(c *gin.Context) {
-	var form form.CreateNodeForm
-
-	if err := c.ShouldBindJSON(&form); err != nil {
-		if validationErrors, ok := err.(validator.ValidationErrors); ok {
-			formattedErrors := util.FormatValidationError(validationErrors)
-			util.RespondWithError(c, http.StatusBadRequest, "Validation failed", formattedErrors)
-			return
-		}
+	userID, _ := c.Get("user_id")
+	userIDUint, _ := userID.(uint)
+	Name := c.PostForm("Name")
+	Type := c.PostForm("Type")
+	ParentID := c.PostForm("ParentID")
+	var parentID *string
+	if c.PostForm("ParentID") != "" {
+		parentID = &ParentID
+	} else {
+		parentID = nil
 	}
 
-	node, err := h.NodeService.CreateNode(form.Type, 1, form.Name, form.ParentID)
+	node, err := h.NodeService.CreateNode(Type, userIDUint, Name, parentID)
 	if err != nil {
 		util.RespondWithError(c, http.StatusBadRequest, err.Error(), nil)
 		return

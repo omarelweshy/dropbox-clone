@@ -2,6 +2,7 @@ package util
 
 import (
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -37,4 +38,16 @@ func FormatDateTime(t time.Time) string {
 	formattedDate := t.Format("Jan 2") + suffix + ", " + t.Format("2006 03:04 PM")
 
 	return formattedDate
+}
+
+func GetFileExtension(s string) *string {
+	pos := strings.LastIndex(s, ".")
+
+	if pos == -1 {
+		return nil
+	}
+
+	result := s[pos+1:]
+
+	return &result
 }
