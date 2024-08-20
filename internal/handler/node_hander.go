@@ -18,6 +18,7 @@ func (h *NodeHandler) CreateNode(c *gin.Context) {
 	userIDUint, _ := userID.(uint)
 	Name := c.PostForm("Name")
 	Type := c.PostForm("Type")
+
 	ParentID := c.PostForm("ParentID")
 	var parentID *string
 	if c.PostForm("ParentID") != "" {
@@ -35,38 +36,6 @@ func (h *NodeHandler) CreateNode(c *gin.Context) {
 	util.RespondWithSuccess(c, "Node Created", gin.H{
 		"ID":   node.ID,
 		"Name": node.Name,
-	})
-}
-
-func (h *NodeHandler) ListNode(c *gin.Context) {
-	id := c.Param("id")
-	var parentID *string
-	if id != "" {
-		parentID = &id
-	} else {
-		parentID = nil
-	}
-	nodes, err := h.NodeService.ListNode(1, parentID)
-
-	if err != nil {
-		util.RespondWithError(c, 404, err.Error(), nil)
-		return
-	}
-
-	var nodeResponses []*form.NodeResponse
-	for _, node := range nodes {
-		nodeResponses = append(nodeResponses, &form.NodeResponse{
-			ID:        node.ID,
-			ParentID:  node.ParentID,
-			Type:      string(node.Type),
-			Name:      node.Name,
-			CreatedAt: util.FormatDateTime(node.CreatedAt),
-			UpdatedAt: util.FormatDateTime(node.UpdatedAt),
-		})
-	}
-
-	util.RespondWithSuccess(c, "Listing Nodes", gin.H{
-		"nodes": nodeResponses,
 	})
 }
 
