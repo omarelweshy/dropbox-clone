@@ -3,7 +3,6 @@ const modal = document.getElementById('modal')
 const closeModal = document.getElementById('closeModal')
 
 createFolder.addEventListener('click', () => {
-  console.log('hery')
   modal.classList.remove('hidden')
 })
 
@@ -17,20 +16,15 @@ window.addEventListener('click', (e) => {
   }
 })
 
-// document
-//   .getElementById('create-folder-form')
-//   .addEventListener('htmx:configRequest', function (evt) {
-//     // Set the Content-Type header to JSON
-//     evt.detail.headers['Content-Type'] = 'application/json'
-//
-//     // Serialize form data into JSON
-//     const form = evt.target
-//     const formData = new FormData(form)
-//     const jsonObject = {}
-//     formData.forEach((value, key) => {
-//       jsonObject[key] = value
-//     })
-//
-//     // Replace the body with the JSON string
-//     evt.detail.body = JSON.stringify(jsonObject)
-//   })
+document
+  .getElementById('create-folder')
+  .addEventListener('htmx:afterRequest', function (event) {
+    res = event.detail.xhr
+    data = JSON.parse(res.response)
+    if (res.status === 200) {
+      modal.classList.add('hidden')
+      window.location.href = `/folder/${data.data.ID}`
+    } else {
+      document.getElementById('error-message').textContent = data.message
+    }
+  })
