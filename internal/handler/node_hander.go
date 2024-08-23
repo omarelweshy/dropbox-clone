@@ -13,37 +13,26 @@ type NodeHandler struct {
 	NodeService service.NodeService
 }
 
-func (h *NodeHandler) CreateNode(c *gin.Context) {
+func (h *NodeHandler) ListingNodes(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	userIDUint, _ := userID.(uint)
-	Name := c.PostForm("Name")
-	Type := c.PostForm("Type")
 
-	ParentID := c.PostForm("ParentID")
+	ParentID, exist := c.Params.Get("id")
 	var parentID *string
-	if c.PostForm("ParentID") != "" {
+	var title string
+	var header string
+	if exist == true {
 		parentID = &ParentID
+		node, _ := h.NodeService.NodeRepository.GetNodeByID(*parentID)
+		title = node.Name
+		header = node.Name + " Files"
 	} else {
 		parentID = nil
+		title = "Home"
+		header = "All Files"
 	}
 
-	node, err := h.NodeService.CreateNode(Type, userIDUint, Name, parentID)
-	if err != nil {
-		util.RespondWithError(c, http.StatusBadRequest, err.Error(), parentID)
-		return
-	}
-
-	util.RespondWithSuccess(c, "Node Created", gin.H{
-		"ID":   node.ID,
-		"Name": node.Name,
-	})
-}
-
-func (h *NodeHandler) Home(c *gin.Context) {
-	userID, _ := c.Get("user_id")
-	userIDUint, _ := userID.(uint)
-
-	nodes, _ := h.NodeService.ListNode(userIDUint, nil)
+	nodes, _ := h.NodeService.ListNode(userIDUint, parentID)
 	var nodeResponses []*form.NodeResponse
 	for _, node := range nodes {
 		nodeResponses = append(nodeResponses, &form.NodeResponse{
@@ -57,11 +46,30 @@ func (h *NodeHandler) Home(c *gin.Context) {
 			UpdatedAt: util.FormatDateTime(node.UpdatedAt),
 		})
 	}
+	util.RenderLayout(c, "index.templ", gin.H{"Title": title, "Header": header, "ParentID": parentID, "Nodes": nodeResponses})
+}
+func (h *NodeHandler) CreateNode(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+	userIDUint, _ := userID.(uint)
+	Name := c.PostForm("Name")
+	Type := c.PostForm("Type")
 
-	util.RenderLayout(c, "index.templ", gin.H{
-		"Title":    "Home",
-		"Header":   "All Files",
-		"ParentID": nil,
-		"Nodes":    nodeResponses,
+	ParentID := c.PostForm("ParentID")
+	var parentID *string
+	if ParentID != "" {
+		parentID = &ParentID
+	} else {
+		parentID = nil
+	}
+
+	node, err := h.NodeService.CreateNode(Type, userIDUint, Name, util.StringPtr(*parentID))
+	if err != nil {
+		util.RespondWithError(c, http.StatusBadRequest, err.Error(), parentID)
+		return
+	}
+
+	util.RespondWithSuccess(c, "Node Created", gin.H{
+		"ID":   node.ID,
+		"Name": node.Name,
 	})
 }

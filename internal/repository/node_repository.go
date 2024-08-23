@@ -46,17 +46,18 @@ func (r *NodeRepository) GetNodeByTypeAndNameAndParentID(nodeType string, user_i
 	// Check if there and error in the parent id itself
 	if parentID != nil {
 		var parentNode model.Node
-		if err := r.DB.Where("id = ?", parentID).First(&parentNode).Error; err != nil {
+		if err := r.DB.Where("id = ?", *parentID).First(&parentNode).Error; err != nil {
 			return nil, errors.New("invalid parentID")
 		}
 	}
+
 	// we split it like that cuz if the parentID is null should be quering like IS NULL
 	// But if the parentID is string should be quering like = 'string'
 	query := r.DB.Where("user_id = ? AND name = ? AND type = ?", user_id, name, nodeType)
 	if parentID == nil {
 		query = query.Where("parent_id IS NULL")
 	} else {
-		query = query.Where("parent_id = ?", parentID)
+		query = query.Where("parent_id = ?", *parentID)
 	}
 	if err := query.First(&node).Error; err != nil {
 		return nil, errors.New(err.Error())

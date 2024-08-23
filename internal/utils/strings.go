@@ -51,3 +51,10 @@ func GetFileExtension(s string) *string {
 
 	return &result
 }
+
+func StringPtr(s string) *string {
+	if s == "<nil>" {
+		return nil
+	}
+	return &s
+}
