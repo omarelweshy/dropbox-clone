@@ -35,6 +35,9 @@ func (r *NodeRepository) ListNodes(userID uint, parentID *string) ([]*model.Node
 	} else {
 		query = query.Where("parent_id = ?", parentID)
 	}
+
+	query = query.Order("created_at DESC")
+
 	if err := query.Find(&nodes).Error; err != nil {
 		return nil, err
 	}
