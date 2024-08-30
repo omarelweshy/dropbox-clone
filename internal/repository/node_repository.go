@@ -23,10 +23,21 @@ func (r *NodeRepository) GetNodeByID(id string) (*model.Node, error) {
 	return &node, nil
 }
 
+func (r *NodeRepository) GetNodeByUserIDAndID(id string, user_id uint) (*model.Node, error) {
+	var node model.Node
+	if err := r.DB.Where("id = ? AND user_id = ?", id).First(&node).Error; err != nil {
+		return nil, err
+	}
+	return &node, nil
+}
+
 func (r *NodeRepository) UpdateNode(node *model.Node) error {
 	return r.DB.Save(node).Error
 }
 
+func (r *NodeRepository) DeleteNode(node *model.Node) error {
+	return r.DB.Delete(node).Error
+}
 func (r *NodeRepository) ListNodes(userID uint, parentID *string) ([]*model.Node, error) {
 	var nodes []*model.Node
 	query := r.DB.Where("user_id = ?", userID)

@@ -73,3 +73,22 @@ func (h *NodeHandler) CreateNode(c *gin.Context) {
 		"Name": node.Name,
 	})
 }
+
+func (h *NodeHandler) DeleteNode(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+	userIDUint, _ := userID.(uint)
+
+	ID, err := c.Params.Get("id")
+	if err == false {
+		util.RespondWithError(c, http.StatusBadRequest, "ID not found", nil)
+		return
+	}
+
+	status, nodeErr := h.NodeService.DeleteNode(userIDUint, ID)
+	if nodeErr != nil {
+		util.RespondWithError(c, http.StatusBadRequest, nodeErr.Error(), nil)
+		return
+	}
+
+	util.RespondWithSuccess(c, "Node Deleted", gin.H{"status": status})
+}

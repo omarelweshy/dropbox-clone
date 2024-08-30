@@ -47,3 +47,14 @@ func (s *NodeService) CreateNode(nodeType string, user_id uint, name string, par
 func (s *NodeService) ListNode(user_id uint, parentID *string) ([]*model.Node, error) {
 	return s.NodeRepository.ListNodes(user_id, parentID)
 }
+
+func (s *NodeService) DeleteNode(user_id uint, id string) (string, error) {
+	node, err := s.NodeRepository.GetNodeByUserIDAndID(id, user_id)
+
+	if err != nil && err.Error() != "record not found" {
+		return "", errors.New(err.Error())
+	}
+
+	s.NodeRepository.DeleteNode(node)
+	return "deleted", nil
+}
