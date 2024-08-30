@@ -43,7 +43,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	// Node endpoints
 	r.POST("/node/create", middleware.AuthMiddleware(authService), nodeHandler.CreateNode)
-	r.POST("/node/:id/delete", middleware.AuthMiddleware(authService), nodeHandler.DeleteNode)
+	r.DELETE("/node/:id/delete", middleware.AuthMiddleware(authService), nodeHandler.DeleteNode)
 
 	return r
 }

@@ -25,7 +25,7 @@ func (r *NodeRepository) GetNodeByID(id string) (*model.Node, error) {
 
 func (r *NodeRepository) GetNodeByUserIDAndID(id string, user_id uint) (*model.Node, error) {
 	var node model.Node
-	if err := r.DB.Where("id = ? AND user_id = ?", id).First(&node).Error; err != nil {
+	if err := r.DB.Where("user_id = ? AND id = ?", user_id, id).First(&node).Error; err != nil {
 		return nil, err
 	}
 	return &node, nil
