@@ -1,3 +1,4 @@
+// Create Folder popup
 const createFolder = document.getElementById('createFolder')
 const modal = document.getElementById('modal')
 const closeModal = document.getElementById('closeModal')
@@ -28,3 +29,5 @@ document
       document.getElementById('error-message').textContent = data.message
     }
   })
+
+// Upload folder / file popup
