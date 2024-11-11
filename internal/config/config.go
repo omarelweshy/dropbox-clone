@@ -19,7 +19,7 @@ var (
 )
 
 func LoadConfig() {
-	dir, errDir := filepath.Abs(filepath.Dir(os.Args[0]))
+	dir, errDir := os.Getwd()
 	if errDir != nil {
 		log.Fatal(errDir)
 	}
