@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -24,6 +25,7 @@ func LoadConfig() {
 		log.Fatal(errDir)
 	}
 	environmentPath := filepath.Join(dir, ".env")
+	fmt.Println(environmentPath)
 
 	err := godotenv.Load(environmentPath)
 	if err != nil {
