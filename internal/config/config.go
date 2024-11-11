@@ -3,6 +3,9 @@ package config
 import (
 	"log"
 	"os"
+	"path/filepath"
+
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -16,16 +19,16 @@ var (
 )
 
 func LoadConfig() {
-	// dir, errDir := os.Getwd()
-	// if errDir != nil {
-	// 	log.Fatal(errDir)
-	// }
-	// environmentPath := filepath.Join(dir, ".env")
-	//
-	// err := godotenv.Load(environmentPath)
-	// if err != nil {
-	// 	log.Fatalf("Error loading .env file")
-	// }
+	dir, errDir := os.Getwd()
+	if errDir != nil {
+		log.Fatal(errDir)
+	}
+	environmentPath := filepath.Join(dir, ".env")
+
+	err := godotenv.Load(environmentPath)
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
 
 	DBUrl = os.Getenv("DATABASE_URL")
 	Host = os.Getenv("HOST")
