@@ -7,6 +7,7 @@ import (
 	store "dropbox-clone/internal/utils"
 	"log"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -34,6 +35,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to migrate models: %v", err)
 	}
+
+	gin.SetMode(config.GinMode)
 
 	r := router.SetupRouter(db)
 	if err := r.Run(":" + config.Port); err != nil {

@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -10,6 +9,7 @@ import (
 )
 
 var (
+	GinMode      string
 	SecretKey    string
 	Host         string
 	ClientID     string
@@ -25,13 +25,13 @@ func LoadConfig() {
 		log.Fatal(errDir)
 	}
 	environmentPath := filepath.Join(dir, ".env")
-	fmt.Println(environmentPath)
 
 	err := godotenv.Load(environmentPath)
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
 
+	GinMode = os.Getenv("ENV_MODE")
 	DBUrl = os.Getenv("DATABASE_URL")
 	Host = os.Getenv("HOST")
 	Port = os.Getenv("PORT")
